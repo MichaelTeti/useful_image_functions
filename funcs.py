@@ -18,3 +18,4 @@ def read_and_write_frames(filename, save_location, num_frames_to_save):
     if cv2.waitKey(10) == 27:                     # exit if Escape is hit
       break
     frame_num += 1
+    
