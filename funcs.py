@@ -2,6 +2,9 @@ import cv2
 import os
 
 def read_and_write_frames(filename, save_location, num_frames_to_save):
+  # Reads video file with name filename and saves the number of frames
+  # specified by num_frames_to_save at save_location.
+  
   vidcap = cv2.VideoCapture(filename) # read video file
   os.chdir(save_location) # go to save location
 
