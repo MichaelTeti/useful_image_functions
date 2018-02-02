@@ -14,6 +14,8 @@ def img_reader(dir, imsz, file_ex=None):
 
     if file_ex is None:
         file_ex = '*'
+    else:
+        file_ex = '*' + file_ex
     folders = os.listdir(dir)
     imgs = np.zeros([0, imsz[0], imsz[1], 3])
     labels = []
