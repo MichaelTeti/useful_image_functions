@@ -6,7 +6,7 @@ import cv2
 
 
 
-def img_reader(dir, imsz, file_ex=None):
+def img_reader(dir, imsz, file_ex=None, sort=False):
     ''' A function that reads in images contained
         in each folder in dir, resizes them to
         imsz[0] x imsz[1], and attaches a label to
@@ -44,6 +44,8 @@ def img_reader(dir, imsz, file_ex=None):
     for folder in xrange(len(folders)):
         os.chdir(dir + '/' + folders[folder])
         files = glob.glob(file_ex)
+        if sort:
+            files.sort()
 
         for file in files:
             if os.path.isfile(file):
