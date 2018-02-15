@@ -37,7 +37,7 @@ def img_reader(dir, imsz, file_ex=None, sort=False):
     folders = os.listdir(dir)
     os.chdir(dir)
     num_ims=sum([len(files) for r, d, files in os.walk(os.getcwd())])
-    imgs = np.zeros([num_ims, imsz[0], imsz[1]])
+    imgs = np.zeros([num_ims, imsz[0], imsz[1], 3])
     labels = np.zeros([num_ims, 1])
     i = 0
 
