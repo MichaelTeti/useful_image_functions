@@ -28,7 +28,9 @@ def img_reader(dir, imsz, file_ex=None, sort=False):
                        you can include the extension as file_ex.
                        Example, file_ex = '.jpg'
     '''
-
+    
+    main_dir = os.getcwd()
+    
     if file_ex is None:
         file_ex = '*'
     else:
@@ -55,4 +57,5 @@ def img_reader(dir, imsz, file_ex=None, sort=False):
                 labels[i, 0] = folder
                 i += 1
 
+    os.chdir(main_dir)            
     return imgs, labels
