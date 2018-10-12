@@ -1,64 +1,52 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.misc import imread, imshow, bytescale, imsave
 import os, glob, h5py, cv2
 from operator import itemgetter
 
-patch_size = 50  # square size
+patch_size = 500  # square size
 imgs = glob.glob('*.png') # get names of all images with .png extension
 imgs += glob.glob('*.jpg') # add to that names of all images with .jpg extension
 num_imgs = len(imgs)  # number of images to load in
+change = False
 
 
-def onclick(event):
-    global ix, iy
-    ix, iy = event.xdata, event.ydata
+
+def click(event, x, y, flags, param):
+	# grab references to the global variables
     global coords
-    coords.append((ix, iy))
-    if ix > 2000 and iy > 1500:
-        fig.canvas.mpl_disconnect(cid)
-        plt.close(1)
-    return
+
+    # if mouse click, record coordinates
+    if event == cv2.EVENT_LBUTTONDOWN:
+        coords = [x, y]
+        cv2.destroyAllWindows()
 
 
+# loop through each image in the directory, show it, and get coordinates
 for img_num, img in enumerate(imgs):
-    # make sure not to do ones you've already done if running twice in same place
-    if 'img+target' in img:
-        continue
-
-    img = bytescale(imread(img))  # read in each image one at a time
+    img_read = cv2.imread(img)  # read in each image one at a time
+    mask = np.int32(np.zeros(img_read.shape))  # create a black mask
 
     # if img is RGBA format, get rid of A
-    if img.shape[-1] == 4:
-        img = img[..., :3]
+    if img_read.shape[-1] == 4:
+        img_read = img_read[..., :3]
 
-    coords = []  # where the coordinates will go
+    # resize image to show it
+    img_resized = cv2.resize(img_read, (img_read.shape[1]//3, img_read.shape[0]//3, ))
 
-    # show the image and allow mouse clicks
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.imshow(np.uint8(img))
-    fig.set_size_inches(100, 100)
+    # show image and get key presses
+    cv2.namedWindow("image")
+    cv2.setMouseCallback("image", click)
+    cv2.imshow("image", img_resized)
+    key = cv2.waitKey(15000) & 0xFF
 
-    # get mouse click locations
-    cid = fig.canvas.mpl_connect('button_press_event', onclick)
-    plt.show()
+    x, y = coords
+    x *= 3
+    y *= 3
+    mask[y-patch_size//2:y+patch_size//2, x-patch_size//2:x+patch_size//2, :] = 255
+    img_target = np.concatenate((img_read, mask), 1)
 
-    # if accidentally clicked outside image, forget that one
-    try:
-        coords = np.int32(np.floor(coords))
-    except AttributeError:
-        continue
+    if 'images_and_targets' not in os.listdir():
+        os.mkdir('images_and_targets')
 
-    for coord_num, coord in enumerate(coords):
-        output = np.zeros(img.shape)
-
-        try:
-            output[coord[1]-patch_size//2:coord[1]+patch_size//2, coord[0]-patch_size//2:coord[0]+patch_size//2, :] = 255
-        except IndexError:
-            continue
-
-        # put the input and target together
-        output = np.concatenate((img, output), 1)
-        print(output.shape)
-        imsave('img+target_' + imgs[img_num][:-4] + '.jpg', output)
+    # save the image
+    cv2.imwrite('images_and_targets/' + img, img_target)
