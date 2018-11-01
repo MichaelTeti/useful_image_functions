@@ -11,10 +11,8 @@ def groupH5(path):
 
     for idx, filename in enumerate(filenames):
         group = output_file.create_group('DataFile_{}'.format(idx))
-        X_loc = group.create_group('data')
-        Y_loc = group.create_group('labels')
 
-        X_loc['data'] = h5py.ExternalLink(filename, 'X')
-        Y_loc['labels'] = h5py.ExternalLink(filename, 'Y')
+        group['data'] = h5py.ExternalLink(filename, 'X')
+        group['labels'] = h5py.ExternalLink(filename, 'Y')
 
     output_file.close()
